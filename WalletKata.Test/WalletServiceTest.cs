@@ -16,11 +16,27 @@ namespace WalletKata.Test
             Assert.Throws<UserNotLoggedInException>(() => walletService.GetWalletsByUser(new User()));
         }
 
+        [Test]
+        public void WhenLoggedUserIsNotFriend_ThenReturnsEmptyListOfWallets()
+        {
+            var userSession = new MockNoFriendsUserSession();
+            var walletService = new WalletService(userSession);
+            var walletsResult = walletService.GetWalletsByUser(new User());
+
+            Assert.IsEmpty(walletsResult);
+            Assert.IsInstanceOf<System.Collections.Generic.List<Wallet>>(walletsResult);
+        }
+
+        //[Test]
+        //public void WhenLoggedUserIsFriend_ThenReturnsListOfWalletsFromDB()
+        //{
+        //    var friend = new User();
+        //    var userSession = new MockFriendUserSession(friend);
+        //}
 
         //The Wallet service (WalletKata/Wallets/WalletService.cs) allows an user to consult the wallets of a friend.
 
-        //If the user is not logged, the service throws a UserNotLoggedInException.
-        //If the logged user is not friend with the user passed in argument, the service returns an empty list.
+
        //If the logged user is friend with the user passed in argument, the service returns the list of wallets fetched from the database.
         //Info : the database and the session is a stub which throws an exception.
 

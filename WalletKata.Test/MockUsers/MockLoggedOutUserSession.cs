@@ -5,11 +5,8 @@ namespace WalletKata.Test.MockUsers
 {
     public class MockLoggedOutUserSession : IUserSession
     {
-        public MockLoggedOutUserSession()
+        public User GetLoggedUser() 
         {
-        }
-
-        public User GetLoggedUser() {
             return null;
         }
     }

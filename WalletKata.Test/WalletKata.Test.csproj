@@ -47,6 +47,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WalletServiceTest.cs" />
     <Compile Include="MockUsers\MockLoggedOutUserSession.cs" />
+    <Compile Include="MockUsers\MockNoFriendsUserSession.cs" />
+    <Compile Include="MockUsers\MockFriendUserSession.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

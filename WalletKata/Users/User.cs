@@ -16,5 +16,11 @@ namespace WalletKata.Users
         {
             friends.Add(friend);
         }
+
+        public bool IsFriendOf(User user)
+        {
+            return friends.Exists(x => x.Equals(user));
+        }
     }
+
 }

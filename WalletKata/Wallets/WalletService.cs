@@ -22,16 +22,11 @@ namespace WalletKata.Wallets
             if (loggedUser == null) throw new UserNotLoggedInException();
 
             List<Wallet> walletList = new List<Wallet>();
-            if (IsFirstUserPartOfSecondUserFriends(loggedUser, user))
+            if (user.IsFriendOf(loggedUser))
             {
                 walletList = walletDAO.FindWalletsByUser(user);
             }
             return walletList;
-        }
-
-        private bool IsFirstUserPartOfSecondUserFriends(User firstUser, User secondUser)
-        {
-            return secondUser.GetFriends().Exists(x => x.Equals(firstUser));
         }
     }
 }

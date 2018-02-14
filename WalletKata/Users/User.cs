@@ -7,7 +7,7 @@ namespace WalletKata.Users
     {
         private List<User> friends = new List<User>();
 
-        public IEnumerable GetFriends()
+        public List<User> GetFriends()
         {
             return friends;
         }

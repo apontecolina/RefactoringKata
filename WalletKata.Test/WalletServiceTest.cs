@@ -2,7 +2,8 @@
 using WalletKata.Wallets;
 using WalletKata.Exceptions;
 using WalletKata.Users;
-using WalletKata.Test.MockUsers;
+using System.Collections.Generic;
+using Moq;
 
 namespace WalletKata.Test
 {
@@ -11,37 +12,61 @@ namespace WalletKata.Test
         [Test]
         public void WhenLoggedOutUser_ThenUserNotLoggedInException()
         {
-            var userSession = new MockLoggedOutUserSession();
-            var walletService = new WalletService(userSession);
+            var mockLoggedOutUserSession = new Mock<IUserSession>();
+            mockLoggedOutUserSession
+                .Setup(userSession => userSession.GetLoggedUser())
+                .Returns(() => null);
+
+            var walletService = new WalletService(
+                mockLoggedOutUserSession.Object, 
+                new Mock<IWalletDAO>().Object
+            );
             Assert.Throws<UserNotLoggedInException>(() => walletService.GetWalletsByUser(new User()));
         }
 
         [Test]
-        public void WhenLoggedUserIsNotFriend_ThenReturnsEmptyListOfWallets()
+        public void WhenLoggedNoFriendsUser_ThenReturnsEmptyListOfWallets()
         {
-            var userSession = new MockNoFriendsUserSession();
-            var walletService = new WalletService(userSession);
+            var mockLoggedNoFriendsUserSession = new Mock<IUserSession>();
+            mockLoggedNoFriendsUserSession
+                .Setup(userSession => userSession.GetLoggedUser())
+                .Returns(() => new User());
+
+            var walletService = new WalletService(
+                mockLoggedNoFriendsUserSession.Object, 
+                new Mock<IWalletDAO>().Object
+            );
             var walletsResult = walletService.GetWalletsByUser(new User());
 
             Assert.IsEmpty(walletsResult);
-            Assert.IsInstanceOf<System.Collections.Generic.List<Wallet>>(walletsResult);
+            Assert.IsInstanceOf<List<Wallet>>(walletsResult);
         }
 
-        //[Test]
-        //public void WhenLoggedUserIsFriend_ThenReturnsListOfWalletsFromDB()
-        //{
-        //    var friend = new User();
-        //    var userSession = new MockFriendUserSession(friend);
-        //}
+        [Test]
+        public void WhenLoggedUserHasFriend_ThenReturnsListOfWalletsFromDB()
+        {
+            var friend = new User();
+            var loggedUser = new User();
+            friend.AddFriend(loggedUser);
 
-        //The Wallet service (WalletKata/Wallets/WalletService.cs) allows an user to consult the wallets of a friend.
+            var mockWalletsFromDB = new List<Wallet>() { new Wallet() };
 
+            var mockLoggedUserWithFriend = new Mock<IUserSession>();
+            mockLoggedUserWithFriend
+                .Setup(userSession => userSession.GetLoggedUser())
+                .Returns(loggedUser);
 
-       //If the logged user is friend with the user passed in argument, the service returns the list of wallets fetched from the database.
-        //Info : the database and the session is a stub which throws an exception.
+            var mockWalletsDAO = new Mock<IWalletDAO>();
+            mockWalletsDAO
+                .Setup(walletDAO => walletDAO.FindWalletsByUser(friend))
+                .Returns(mockWalletsFromDB);
 
-
-        //If the instructions are not clear, please create a github issue.
-
+            var walletService = new WalletService(
+                mockLoggedUserWithFriend.Object,
+                mockWalletsDAO.Object
+            );
+            var walletsResult = walletService.GetWalletsByUser(friend);
+            Assert.AreEqual(mockWalletsFromDB, walletsResult);
+        }
     }
 }

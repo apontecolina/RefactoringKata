@@ -8,7 +8,13 @@ namespace WalletKata.Wallets
     {
         private readonly IUserSession userSession;
 
-        public WalletService(IUserSession userSession) => this.userSession = userSession;
+        private readonly IWalletDAO walletDAO;
+
+        public WalletService(IUserSession userSession, IWalletDAO walletDAO)
+        {
+            this.userSession = userSession;
+            this.walletDAO = walletDAO;
+        }
 
         public List<Wallet> GetWalletsByUser(User user)
         {
@@ -29,7 +35,7 @@ namespace WalletKata.Wallets
 
                 if (isFriend)
                 {
-                    walletList = WalletDAO.FindWalletsByUser(user);
+                    walletList = walletDAO.FindWalletsByUser(user);
                 }
 
                 return walletList;
